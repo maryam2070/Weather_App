@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/weatherFragment">
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.example.weatherapp.presentation.map.components.ui.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_mapsFragment_to_weatherFragment"
+            app:destination="@id/weatherFragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/weatherFragment"
+            app:popUpToInclusive="true">
+            <argument
+                android:name="time_zone"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="latitude"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="longitude"
+                android:defaultValue=" "
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/weatherFragment"
+        android:name="com.example.weatherapp.presentation.current_day.components.ui.WeatherFragment"
+        android:label="fragment_weather"
+        tools:layout="@layout/fragment_weather" >
+        <action
+            android:id="@+id/action_weatherFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment"
+            app:popUpTo="@id/weatherFragment">
+            <argument
+                android:name="time_zone"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="latitude"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="longitude"
+                android:defaultValue=" "
+                app:argType="string" />
+        </action>
+        <action
+            android:id="@+id/action_weatherFragment_to_locationsListFragment"
+            app:destination="@id/locationsListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/locationsListFragment"
+        android:name="com.example.weatherapp.presentation.locations_list.components.ui.LocationsListFragment"
+        android:label="fragment_locations_list"
+        tools:layout="@layout/fragment_locations_list" >
+        <action
+            android:id="@+id/action_locationsListFragment_to_weatherFragment"
+            app:destination="@id/weatherFragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/weatherFragment"
+            app:popUpToInclusive="true">
+
+            <argument
+                android:name="time_zone"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="latitude"
+                android:defaultValue=" "
+                app:argType="string" />
+            <argument
+                android:name="longitude"
+                android:defaultValue=" "
+                app:argType="string" />
+        </action>
+    </fragment>
+</navigation>
