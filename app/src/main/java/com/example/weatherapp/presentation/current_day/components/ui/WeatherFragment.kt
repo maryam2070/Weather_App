@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.withCreated
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherapp.R
@@ -25,10 +26,7 @@ import com.example.weatherapp.presentation.current_day.components.adapter.Hourly
 import com.example.weatherapp.presentation.current_day.components.adapter.bindWeatherStatusImageHourlyWithAnimation
 import com.example.weatherapp.presentation.current_day.components.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 
@@ -108,54 +106,63 @@ class WeatherFragment : Fragment() {
             )
         }else{
             viewModel.getFavTimeZone()
-            GlobalScope.launch(Dispatchers.Main) {
+            CoroutineScope(Dispatchers.Main).launch {
+
                 viewModel.favTimeZoneResponse.collect { response ->
-                    when (response) {
-                        is Resource.Error -> {
-                            binding.loadingPb.visibility = View.INVISIBLE
-                            Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                        is Resource.Loading -> {
-                            binding.loadingPb.visibility = View.VISIBLE
-                        }
-                        is Resource.Success -> {
-                            binding.loadingPb.visibility = View.INVISIBLE
-                            val data = response.data!!
-                            if (!data.latitude.isBlank()) {
-                                editor.putBoolean("have_fav",true)
-                                editor.commit()
-                                editor.apply()
-                                viewModel.getCurrentDayWeather(
-                                    data.latitude.toFloat(),
-                                    data.longitude.toFloat(),
-                                    data.timezone_id,
-                                    getFormattedDate(getCurrentDay()),
-                                    getFormattedDate(getCurrentDay())
+
+                        when (response) {
+                            is Resource.Error -> {
+                                binding.loadingPb.visibility = View.INVISIBLE
+                                Toast.makeText(
+                                    requireContext(),
+                                    response.message,
+                                    Toast.LENGTH_SHORT
                                 )
-                                viewModel.getWeeklyWeather(
-                                    data.latitude.toFloat(),
-                                    data.longitude.toFloat(),
-                                    data.timezone_id,
-                                    getFormattedDate(getCurrentDay()),
-                                    getFormattedDate(addDaysPeriodToCalendar(getCurrentDay(), 6))
-                                )
-                            }else{
-                                editor.putBoolean("have_fav",false)
-                                editor.commit()
-                                editor.apply()
-                                binding.container.visibility=View.INVISIBLE
-                                showChooseLocationDialog()
+                                    .show()
                             }
-                            this.cancel()
+                            is Resource.Loading -> {
+                                binding.loadingPb.visibility = View.VISIBLE
+                            }
+                            is Resource.Success -> {
+                                binding.loadingPb.visibility = View.INVISIBLE
+                                val data = response.data!!
+                                if (data.latitude.isNotBlank()) {
+                                    editor.putBoolean("have_fav", true).apply()
+                                    viewModel.getCurrentDayWeather(
+                                        data.latitude.toFloat(),
+                                        data.longitude.toFloat(),
+                                        data.timezone_id,
+                                        getFormattedDate(getCurrentDay()),
+                                        getFormattedDate(getCurrentDay())
+                                    )
+                                    viewModel.getWeeklyWeather(
+                                        data.latitude.toFloat(),
+                                        data.longitude.toFloat(),
+                                        data.timezone_id,
+                                        getFormattedDate(getCurrentDay()),
+                                        getFormattedDate(
+                                            addDaysPeriodToCalendar(
+                                                getCurrentDay(),
+                                                6
+                                            )
+                                        )
+                                    )
+                                } else {
+                                    editor.putBoolean("have_fav", false).apply()
+                                    binding.container.visibility = View.INVISIBLE
+                                    showChooseLocationDialog()
+                                }
+                            }
                         }
+
                     }
+
                 }
             }
 
-        }
 
-        GlobalScope.launch(Dispatchers.Main) {
+
+        CoroutineScope(Dispatchers.Main).launch{
             viewModel.getCurrentWeatherResponse.collect { response ->
                 when (response) {
                     is Resource.Error -> {
@@ -170,12 +177,13 @@ class WeatherFragment : Fragment() {
                         binding.loadingPb.visibility = View.INVISIBLE
                         binding.container.visibility=View.VISIBLE
                         updateUI(response.data!!)
-                        this.cancel()
+
                     }
                 }
+
             }
         }
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(Dispatchers.Main).launch {
             viewModel.getWeeklyWeatherResponse.collect { response ->
                 when (response) {
                     is Resource.Error -> {
@@ -191,7 +199,9 @@ class WeatherFragment : Fragment() {
                         updateWeeklyUI(response.data!!)
                         this.cancel()
                     }
+
                 }
+
             }
         }
 
@@ -205,6 +215,7 @@ class WeatherFragment : Fragment() {
             .setPositiveButton("go")
             { dialog, _ ->
                 try {
+                    dialog.dismiss()
                     findNavController().navigate(com.example.weatherapp.R.id.action_weatherFragment_to_mapsFragment)
                 } catch (e: ActivityNotFoundException) {
                     e.printStackTrace()

@@ -41,7 +41,7 @@ class TimeZoneRepositoryImp @Inject constructor(private val api: TimeZoneApi,pri
         return dao.getAll()
     }
 
-    override fun getFavTimeZone(): Flow<TimeZoneEntity> {
+    override suspend  fun getFavTimeZone(): TimeZoneEntity {
         return dao.getFavTimeZone()
     }
 }

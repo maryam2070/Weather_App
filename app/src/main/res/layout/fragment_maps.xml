@@ -61,6 +61,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:alpha="0.5"
+        app:cardCornerRadius="3dp"
+        style="@style/MapItems"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/map"
         app:layout_constraintHorizontal_bias="1.0"
@@ -69,7 +73,7 @@
         app:layout_constraintVertical_bias="0.0">
 
         <ImageView
-            style="@style/CardView"
+            style="@style/MapItems"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_margin="10dp"

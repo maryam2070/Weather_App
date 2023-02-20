@@ -56,6 +56,7 @@
 
     <style name="MapItems" parent="Theme.WeatherApp">
         <item name="android:background">@color/white</item>
+        <item name="cardBackgroundColor">@color/white</item>
     </style>
 
     <style name="GradiantBackground" parent="Theme.WeatherApp">

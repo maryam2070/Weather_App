@@ -33,9 +33,7 @@ import com.example.weatherapp.presentation.current_day.components.ui.ModalBottom
 import com.google.android.gms.maps.model.*
 import com.master.permissionhelper.PermissionHelper
 import com.master.permissionhelper.PermissionHelper.PermissionCallback
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.IOException
 
 
@@ -162,39 +160,60 @@ class MapsFragment : Fragment() {
                 marker.latitude.toString()+","+marker.longitude.toString()
             )
 
-            GlobalScope.launch(Dispatchers.Main) {
+            CoroutineScope(Dispatchers.IO).launch {
                 viewModel.getTimeZoneResponse.collect { response ->
-                    when (response) {
-                        is Resource.Error -> {
-                            binding.loadingPb.visibility = View.INVISIBLE
-                            Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                        is Resource.Loading -> {
-
-                            binding.loadingPb.visibility = View.VISIBLE
-                        }
-                        is Resource.Success -> {
-
-
-                            if(sharedPreferences.getBoolean("have_fav",false)==false)
-                            {
-                                viewModel.insertTimeZone(TimeZone(response.data!!.latitude,response.data!!.longitude,response.data!!.timezone_id,true))
-                            }else{
-                                viewModel.insertTimeZone(TimeZone(response.data!!.latitude,response.data!!.longitude,response.data!!.timezone_id,false))
+                    withContext(Dispatchers.Main) {
+                        when (response) {
+                            is Resource.Error -> {
+                                binding.loadingPb.visibility = View.INVISIBLE
+                                Toast.makeText(
+                                    requireContext(),
+                                    response.message,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
                             }
+                            is Resource.Loading -> {
 
-                            //navigation transaction
-                            val args=Bundle()
-                            args.putString("time_zone",response.data!!.timezone_id)
-                            args.putString("latitude",response.data!!.latitude)
-                            args.putString("longitude",response.data!!.longitude)
-                            binding.loadingPb.visibility = View.INVISIBLE
+                                binding.loadingPb.visibility = View.VISIBLE
+                            }
+                            is Resource.Success -> {
+                                if (sharedPreferences.getBoolean("have_fav", false) == false) {
+                                    viewModel.insertTimeZone(
+                                        TimeZone(
+                                            response.data!!.latitude,
+                                            response.data!!.longitude,
+                                            response.data!!.timezone_id,
+                                            true
+                                        )
+                                    )
+                                    editor.putBoolean("have_fav", true).apply()
+                                } else {
+                                    viewModel.insertTimeZone(
+                                        TimeZone(
+                                            response.data!!.latitude,
+                                            response.data!!.longitude,
+                                            response.data!!.timezone_id,
+                                            false
+                                        )
+                                    )
+                                }
+
+                                //navigation transaction
+                                val args = Bundle()
+                                args.putString("time_zone", response.data!!.timezone_id)
+                                args.putString("latitude", response.data!!.latitude)
+                                args.putString("longitude", response.data!!.longitude)
+                                binding.loadingPb.visibility = View.INVISIBLE
 
 
-                            findNavController().navigate(R.id.action_mapsFragment_to_weatherFragment,args)
+                                findNavController().navigate(
+                                    R.id.action_mapsFragment_to_weatherFragment,
+                                    args
+                                )
 
 
+                            }
                         }
                     }
                 }

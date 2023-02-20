@@ -29,14 +29,11 @@ class FetchTimeZoneUseCase @Inject constructor(private val repository: TimeZoneR
     fun getFavTimeZones(): Flow<Resource<TimeZone>> = flow {
         emit(Resource.Loading())
         try {
-            repository.getFavTimeZone().collect{
-                if (it != null)
-                    emit(Resource.Success(it.toTimeZone()))
+            val data=repository.getFavTimeZone()
+                if (data != null)
+                    emit(Resource.Success(data.toTimeZone()))
                 else
                     emit(Resource.Success(TimeZone("", "", "", false)))
-            }
-
-
         } catch (e: IOException) {
             emit(Resource.Error(e.message.toString()))
             Log.d("getAllTimeZoneUseCase", e.message.toString())

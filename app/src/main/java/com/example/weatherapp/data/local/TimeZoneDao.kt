@@ -13,7 +13,7 @@ interface TimeZoneDao {
     @Query("select * from timezoneentity")
     fun getAll(): Flow<List<TimeZoneEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insetTimeZone(timeZoneEntity: TimeZoneEntity)
 
     @Query("delete from timezoneentity")
@@ -28,7 +28,7 @@ interface TimeZoneDao {
 
     @Nullable
     @Query("SELECT * FROM timezoneentity WHERE fav = true")
-    fun getFavTimeZone():Flow<TimeZoneEntity>
+    suspend fun getFavTimeZone():TimeZoneEntity
 
 
     @Query("delete from timezoneentity ")

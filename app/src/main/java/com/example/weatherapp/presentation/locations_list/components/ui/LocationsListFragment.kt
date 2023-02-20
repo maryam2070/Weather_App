@@ -19,9 +19,7 @@ import com.example.weatherapp.domain.model.TimeZone
 import com.example.weatherapp.presentation.current_day.components.adapter.TimeZoneAdapter
 import com.example.weatherapp.presentation.locations_list.components.viewmodels.LocationsListViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,7 +59,8 @@ class LocationsListFragment : Fragment() {
         binding.backIv.setOnClickListener {
             findNavController().popBackStack()
         }
-        GlobalScope.launch(Dispatchers.Main) {
+
+        CoroutineScope(Dispatchers.Main).launch {
             viewModel.getAllTimeZonesResponse.collect { response ->
                 when (response) {
                     is Resource.Error -> {

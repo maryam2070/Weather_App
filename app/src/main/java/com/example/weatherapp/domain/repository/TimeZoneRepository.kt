@@ -13,5 +13,5 @@ interface TimeZoneRepository {
     suspend fun deleteAllTimeZones()
     suspend fun updateTimeZone(timeZoneEntity: TimeZoneEntity)
     fun getAllTimeZones():Flow<List<TimeZoneEntity>>
-    fun getFavTimeZone():Flow<TimeZoneEntity>
+    suspend fun getFavTimeZone():TimeZoneEntity
 }

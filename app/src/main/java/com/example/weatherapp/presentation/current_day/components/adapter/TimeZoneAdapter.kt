@@ -22,6 +22,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import okhttp3.Dispatcher
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 
 @DelicateCoroutinesApi
@@ -53,10 +54,11 @@ class TimeZoneAdapter @Inject constructor(val list: ArrayList<TimeZone>, val con
                 binding.favIc.setImageResource(R.drawable.ic_baseline_favorite_border_24)
 
             binding.favIc.setOnClickListener {
-                    var fav: TimeZone? =null
-                    viewModel.getFavTimeZone()
+                var fav: TimeZone? = null
+                viewModel.getFavTimeZone()
 
-                    GlobalScope.launch() {
+
+            CoroutineScope(IO).launch {
                         println("AAAAA ccccccccccccccccccc")
                         viewModel.favTimeZoneResponse.collect {
                             when (it) {
@@ -71,7 +73,6 @@ class TimeZoneAdapter @Inject constructor(val list: ArrayList<TimeZone>, val con
                                     model.fav = true
                                     viewModel.updateTimeZone(model)
 
-                                    this.cancel()
                                 }
                             }
                         }
